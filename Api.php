@@ -1,4 +1,7 @@
 <?php
+
+use Firebase\JWT\JWT;
+
 class Api extends Rest
 {
     public $conn;
@@ -27,6 +30,21 @@ class Api extends Rest
         if ($user->num_rows > 0) {
             $users = $user->fetch_assoc();
             echo $users['email'];
+
+            $payload = [
+                'iat' => time(),
+                'iss' => 'localhost',
+                'exp' => time() + (60),
+                'userId' => $user['id']
+            ];
+
+            define('SECRETE_KEY', 'Abc123');
+            $algorithm = 'HS256';
+
+            $token = JWT::encode($payload, SECRETE_KEY, $algorithm);
+            $data = ['token' => $token];
+
+            $this->returnResponse(200, $data);
         }
     }
 }
